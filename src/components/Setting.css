@@ -1,3 +1,6 @@
+.setting {
+    margin: 5em;
+}
 
 .inputgroup {
     width: 65% !important;
@@ -14,5 +17,10 @@
 
 .minval {
     margin-top: 1em;
+    width: 25% !important;
+}
+
+.timestamp {
+    margin-top: 3em;
     width: 25% !important;
 }

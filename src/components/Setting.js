@@ -1,20 +1,24 @@
 import React from "react";
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import './Setting.css'
 
 
 const Setting = () => {
-    return(
-        <>
+        return(
+        <div className="setting">
             {/*Token address  */}
-            <InputGroup size="lg" className="inputgroup">
-                <InputGroup.Text id="inputGroup-sizing-lg">Token Address</InputGroup.Text>
-                <Form.Control
-                aria-label="Large"
-                aria-describedby="inputGroup-sizing-sm"
-                />
-            </InputGroup>
+            <div className="tokenaddr">
+                <InputGroup size="lg" className="inputgroup">
+                    <InputGroup.Text id="inputGroup-sizing-lg">Token Address</InputGroup.Text>
+                    <Form.Control
+                    aria-label="Large"
+                    aria-describedby="inputGroup-sizing-sm"
+                    />
+                </InputGroup>
+            </div>
             {/* Sol Max and Min value */}
             <div className="max-min-val">
                 <InputGroup size="lg" className="maxval">
@@ -39,9 +43,15 @@ const Setting = () => {
                 </InputGroup>
             </div>
             {/* Timestamp */}
-            
+            <div className="time">
+                <InputGroup className="mb-3 timestamp">
+                    <InputGroup.Text id="inputGroup-sizing-lg">TimeStamp</InputGroup.Text>
+                    <Form.Control/>
 
-        </>
+                    <InputGroup.Text id="inputGroup-sizing-lg">S</InputGroup.Text>
+                </InputGroup>
+            </div>
+        </div>
     )
 }
 
