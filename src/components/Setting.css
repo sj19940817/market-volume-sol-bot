@@ -8,19 +8,24 @@
 
 .max-min-val {
     margin-top: 3em;
+    width: 50%;
 }
 
 .maxval {
-    width: 25% !important;
+    width: 316px !important;
     margin-bottom: 1em;
 }
 
 .minval {
     margin-top: 1em;
-    width: 25% !important;
+    width: 316px !important
 }
 
 .timestamp {
     margin-top: 3em;
     width: 25% !important;
+}
+
+.run-btn {
+    margin-top: 3em;
 }
