@@ -15,6 +15,7 @@ const Setting = () => {
                     <Form.Control
                     aria-label="Large"
                     aria-describedby="inputGroup-sizing-sm"
+                    placeholder="0xdac17f958d2ee523a2206206994597c13d831ec7"
                     />
                 </InputGroup>
             </div>
@@ -51,7 +52,7 @@ const Setting = () => {
             <div className="time">
                 <InputGroup className="mb-3 timestamp">
                     <InputGroup.Text id="inputGroup-sizing-lg">TimeStamp</InputGroup.Text>
-                    <Form.Control/>
+                    <Form.Control placeholder="0"/>
                     <InputGroup.Text id="inputGroup-sizing-lg">S</InputGroup.Text>
                 </InputGroup>
             </div>
