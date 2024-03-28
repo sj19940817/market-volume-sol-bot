@@ -1,0 +1,18 @@
+
+.inputgroup {
+    width: 65% !important;
+}
+
+.max-min-val {
+    margin-top: 3em;
+}
+
+.maxval {
+    width: 25% !important;
+    margin-bottom: 1em;
+}
+
+.minval {
+    margin-top: 1em;
+    width: 25% !important;
+}
