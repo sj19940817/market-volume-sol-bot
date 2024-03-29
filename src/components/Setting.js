@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Run from "./Run";
@@ -6,7 +6,17 @@ import './Setting.css'
 
 
 const Setting = () => {
-        return(
+    const [tokenaddress, setTokenaddress] = useState('HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9')
+    const handleToken = (e) => {
+        setTokenaddress(e.target.value)
+        console.log(tokenaddress)
+    }
+
+    useEffect(() => {
+        setTokenaddress(tokenaddress)
+    }, [])
+    
+    return(
         <div className="setting">
             {/*Token address  */}
             <div className="tokenaddr">
@@ -16,6 +26,7 @@ const Setting = () => {
                     aria-label="Large"
                     aria-describedby="inputGroup-sizing-sm"
                     placeholder="HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9"
+                    onChange={(e) => handleToken(e)}
                     />
                 </InputGroup>
             </div>
@@ -45,7 +56,7 @@ const Setting = () => {
                 </div>
                 {/* Button */}
                 <div className="run-btn"> 
-                    <Run />
+                    <Run tokenaddress={tokenaddress}/>
                 </div>
             </div>
             {/* Timestamp */}
