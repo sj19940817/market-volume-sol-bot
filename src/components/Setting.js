@@ -15,7 +15,7 @@ const Setting = () => {
                     <Form.Control
                     aria-label="Large"
                     aria-describedby="inputGroup-sizing-sm"
-                    placeholder="0xdac17f958d2ee523a2206206994597c13d831ec7"
+                    placeholder="HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9"
                     />
                 </InputGroup>
             </div>

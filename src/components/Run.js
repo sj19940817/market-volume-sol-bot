@@ -5,27 +5,33 @@ import Button from 'react-bootstrap/Button';
 const Run = () => {
     const [isRunning, setRunning] = useState(false);
 
-    useEffect(() => {
-        function simulateNetworkRequest() {
-          return new Promise((resolve) => setTimeout(resolve, 2000));
-        }
+    // useEffect(() => {
+    //     function simulateNetworkRequest() {
+    //       return new Promise((resolve) => setTimeout(resolve, 2000));
+    //     }
     
-        if (isRunning) {
-          simulateNetworkRequest().then(() => {
-            setRunning(false);
-          });
-        }
-      }, [isRunning]);
+    //     if (isRunning) {
+    //       simulateNetworkRequest().then(() => {
+    //         setRunning(false);
+    //       });
+    //     }
+    //   }, [isRunning]);
 
-      const handleClick = () => setRunning(true);
+      const handleClickStart = () => {
+        
+        setRunning(true);
+      }
+      const handleClickStop = () => {
+        setRunning(false)
+      }
     return (
         <Button
-        variant="danger"
-        disabled={isRunning}
-        onClick={!isRunning ? handleClick : null}
+        variant={isRunning ? 'danger' : 'primary'}
+        // disabled={isRunning}
+        onClick={!isRunning ? handleClickStart : handleClickStop}
         style={{marginTop: '0', width: '160px', height: '54px', fontSize: '25px'}}
         >
-         {isRunning ? 'Running…' : 'Start'}
+         {isRunning ? 'Stop Bot' : 'Start Bot'}
         </Button>
     )
 }
