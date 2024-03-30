@@ -10,7 +10,7 @@ const {
     VersionedTransaction,
   } = require("@solana/web3.js");
 const bs58 = require("bs58");
-// set middleware
+const { type } = require('@testing-library/user-event/dist/type');
 // when setting middleware, we use app.use()
 app.use(bodyParser.json());
 
@@ -27,12 +27,31 @@ const corsOpts = {
 };
 app.use(cors(corsOpts));
 
+
+
 const connection = new Connection(
     "https://spring-capable-tent.solana-mainnet.quiknode.pro/6a3fa9f48cd11ebaa96901b009e38a33aa1968b1/",
     "confirmed"
 );
-const wallet = Keypair.fromSecretKey(bs58.decode(WALLET_SECRET_KEY[0].secret_key));
-console.log("wallet", wallet)
+
+// Function to shuffle an array
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
+// Generate an array containing numbers from 1 to 30
+const numbers = Array.from({ length: 5 }, (_, index) => index);
+
+// Shuffle the array
+const shuffledNumbers = shuffleArray(numbers);
+console.log(shuffledNumbers)
+
+
+
 const MSG = {
   loadInputTokenSuccess: "✅ Loaded input tokens successfully!",
   loadTradeTokenSuccess: "✅ Loaded trade tokens successfully!",
@@ -48,9 +67,18 @@ const MSG = {
   startToBuy: "Start to buy!",
   waiting: "waiting...",
 };
-const swap = async (input, output, inputAmount) => {
+
+const sleep = async (ms) => {
+  console.log(`Retry after ${ms / 1000} seconds...`);
+  console.log(MSG.waiting);
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const swap = async (input, output, inputAmount, index) => {
+  const wallet = Keypair.fromSecretKey(bs58.decode(WALLET_SECRET_KEY[index].secret_key));
   const SLIPPAGE = 5;
   let quoteResponse = null;
+  console.log(input, output, inputAmount, index)
   try {
     quoteResponse = await axios.get(
         `https://quote-api.jup.ag/v6/quote?inputMint=${input}&outputMint=${output}&amount=${inputAmount}&slippageBps=${SLIPPAGE}`
@@ -113,12 +141,27 @@ const swap = async (input, output, inputAmount) => {
   }
 }
 
+const executeTransaction = async (input, tokenaddress, inputAmount, index) => {
+  console.log(index, shuffledNumbers, shuffledNumbers[index])
+  await swap(input, tokenaddress, inputAmount, shuffledNumbers[index])
+  // index exception
+  if(index < 4) {
+    setTimeout(executeTransaction, 3000, input, tokenaddress, inputAmount, index+1)
+  } else {
+    return 'end'
+  }
+}
 app.get('/', async (req, res) => {
     const input = "So11111111111111111111111111111111111111112";
-    const inputAmount = Math.pow(10, 9) * 0.0001
+    const inputAmount = Math.pow(10, 9) * 0.00001
     const {tokenaddress} = req.query;
-
-  await swap(input, tokenaddress, inputAmount)
+    console.log("shuffledNumbers", shuffledNumbers)
+    executeTransaction(input, tokenaddress, inputAmount, 0)
+  // shuffledNumbers.map(async (value, index) => {
+  //   console.log(index, value)
+  //   await swap(input, tokenaddress, inputAmount, value)
+  //   await sleep(300000)
+  // })
   res.status(200).json({"tokenaddress":tokenaddress})
 
 })

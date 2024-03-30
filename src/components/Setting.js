@@ -6,16 +6,8 @@ import './Setting.css'
 
 
 const Setting = () => {
-    const [tokenaddress, setTokenaddress] = useState('HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9')
-    const handleToken = (e) => {
-        setTokenaddress(e.target.value)
-        console.log(tokenaddress)
-    }
+    const [tokenaddress, setTokenaddress] = useState('')
 
-    useEffect(() => {
-        setTokenaddress(tokenaddress)
-    }, [])
-    
     return(
         <div className="setting">
             {/*Token address  */}
@@ -26,7 +18,9 @@ const Setting = () => {
                     aria-label="Large"
                     aria-describedby="inputGroup-sizing-sm"
                     placeholder="HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9"
-                    onChange={(e) => handleToken(e)}
+                    value={tokenaddress}
+                    onChange={e => setTokenaddress(e.target.value)}
+                    required
                     />
                 </InputGroup>
             </div>

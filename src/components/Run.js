@@ -38,7 +38,7 @@ const Run = (props) => {
         } catch (err) {
           console.log("error")
         }
-        };
+      };
       const handleClickStop = () => {
         setRunning(false)
       }
