@@ -7,6 +7,9 @@ import './Setting.css'
 
 const Setting = () => {
     const [tokenaddress, setTokenaddress] = useState('')
+    const [maxSol, setMaxSol] = useState(0);
+    const [minSol, setMinSol] = useState(0);
+    const [timestamp, setTimestamp] = useState(0);
 
     return(
         <div className="setting">
@@ -20,7 +23,6 @@ const Setting = () => {
                     placeholder="HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9"
                     value={tokenaddress}
                     onChange={e => setTokenaddress(e.target.value)}
-                    required
                     />
                 </InputGroup>
             </div>
@@ -34,6 +36,8 @@ const Setting = () => {
                         aria-describedby="inputGroup-sizing-sm"
                         type="number"
                         placeholder="0"
+                        value={maxSol}
+                        onChange={e => setMaxSol(e.target.value)}
                         />
                         <InputGroup.Text>SOL</InputGroup.Text>
                     </InputGroup>
@@ -44,20 +48,23 @@ const Setting = () => {
                         aria-describedby="inputGroup-sizing-sm"
                         type="number"
                         placeholder="0"
+                        value={minSol}
+                        onChange={e => setMinSol(e.target.value)}
                         />
                         <InputGroup.Text>SOL</InputGroup.Text>
                     </InputGroup>
                 </div>
                 {/* Button */}
                 <div className="run-btn"> 
-                    <Run tokenaddress={tokenaddress}/>
+                    <Run tokenaddress={tokenaddress} maxSol={maxSol} minSol={minSol} timestamp={timestamp}/>
                 </div>
             </div>
             {/* Timestamp */}
             <div className="time">
                 <InputGroup className="mb-3 timestamp">
                     <InputGroup.Text id="inputGroup-sizing-lg">TimeStamp</InputGroup.Text>
-                    <Form.Control placeholder="0"/>
+                    <Form.Control placeholder="0"  type="number" value={timestamp}
+                        onChange={e => setTimestamp(e.target.value)} />
                     <InputGroup.Text id="inputGroup-sizing-lg">S</InputGroup.Text>
                 </InputGroup>
             </div>

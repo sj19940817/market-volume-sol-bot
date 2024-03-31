@@ -7,40 +7,46 @@ const Run = (props) => {
     const [isRunning, setRunning] = useState(false);
     const API_URL = 'http://localhost:8080/'
     const tokenaddress = props.tokenaddress
-    // useEffect(() => {
-    //     function simulateNetworkRequest() {
-    //       return new Promise((resolve) => setTimeout(resolve, 2000));
-    //     }
-    
-    //     if (isRunning) {
-    //       simulateNetworkRequest().then(() => {
-    //         setRunning(false);
-    //       });
-    //     }
-    //   }, [isRunning]);
-
-      // const handleClickStart = async () => {
-      //   const data = await axios.get(API_URL)
-      //   setRunning(true);
-      // }
+    const maxSol = props.maxSol
+    const minSol = props.minSol
+    const timestamp = props.timestamp
 
       const handleClickStart = async () => {
+        
+        if(tokenaddress && maxSol && minSol && timestamp) {
+          setRunning(true)
+          try {
+            const res = await axios.get(
+              API_URL,
+              {
+                params: {
+                  tokenaddress: tokenaddress,
+                  maxSol: maxSol,
+                  minSol: minSol,
+                  timestamp: timestamp
+                },
+              }
+            );
+            console.log(res.data);
+          } catch (err) {
+            console.log("error")
+          }
+        } else {
+          alert('Please complete all inputbox')
+          setRunning(false)
+          
+        }
+      };
+      const handleClickStop = async () => {
+        setRunning(false)
         try {
           const res = await axios.get(
-            API_URL,
-            {
-              params: {
-                tokenaddress: tokenaddress,
-              },
-            }
+            `${API_URL}stop`,
           );
           console.log(res.data);
         } catch (err) {
           console.log("error")
         }
-      };
-      const handleClickStop = () => {
-        setRunning(false)
       }
     return (
         <Button

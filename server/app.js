@@ -14,9 +14,6 @@ const { type } = require('@testing-library/user-event/dist/type');
 // when setting middleware, we use app.use()
 app.use(bodyParser.json());
 
-// set the public path of backend
-// app.use(express.static(path.join(__dirname, 'public')));
-
 // allow the cors error
 const corsOpts = {
     origin: '*',
@@ -27,7 +24,9 @@ const corsOpts = {
 };
 app.use(cors(corsOpts));
 
+var timeoutId = null;
 
+// let timeoutId = null
 
 const connection = new Connection(
     "https://spring-capable-tent.solana-mainnet.quiknode.pro/6a3fa9f48cd11ebaa96901b009e38a33aa1968b1/",
@@ -47,10 +46,8 @@ const shuffleArray = (array) => {
 const numbers = Array.from({ length: 5 }, (_, index) => index);
 
 // Shuffle the array
-const shuffledNumbers = shuffleArray(numbers);
+let shuffledNumbers = shuffleArray(numbers);
 console.log(shuffledNumbers)
-
-
 
 const MSG = {
   loadInputTokenSuccess: "✅ Loaded input tokens successfully!",
@@ -68,15 +65,9 @@ const MSG = {
   waiting: "waiting...",
 };
 
-const sleep = async (ms) => {
-  console.log(`Retry after ${ms / 1000} seconds...`);
-  console.log(MSG.waiting);
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
-
 const swap = async (input, output, inputAmount, index) => {
   const wallet = Keypair.fromSecretKey(bs58.decode(WALLET_SECRET_KEY[index].secret_key));
-  const SLIPPAGE = 5;
+  const SLIPPAGE = 100;
   let quoteResponse = null;
   console.log(input, output, inputAmount, index)
   try {
@@ -130,39 +121,59 @@ const swap = async (input, output, inputAmount, index) => {
         outAmount: Number(quoteResponseData.outAmount),
       };
     } catch (error) {
-      console.log(MSG.confirmTransactionFailed);
-      // updateLog(MSG.confirmTransactionFailed);
-      // await sleep(300000);
-      // console.log("error: ", error.message);
-      return false;
+        console.log(MSG.confirmTransactionFailed);
+        return false;
     }
   } catch (err) {
     console.log("err", err)
   }
 }
 
-const executeTransaction = async (input, tokenaddress, inputAmount, index) => {
-  console.log(index, shuffledNumbers, shuffledNumbers[index])
-  await swap(input, tokenaddress, inputAmount, shuffledNumbers[index])
-  // index exception
-  if(index < 4) {
-    setTimeout(executeTransaction, 3000, input, tokenaddress, inputAmount, index+1)
-  } else {
-    return 'end'
-  }
+const executeTransaction = async (input, tokenaddress, inputAmount, index, timestamp) => {
+
+  if(index < 5 ) {
+    // Generate a random number between MaxSOL and MinSOL
+    const randomNumber = (Math.random() * (Number(inputAmount.max) - Number(inputAmount.min)) + Number(inputAmount.max)).toFixed(6);
+    console.log("randomNumber", randomNumber)
+    const InAmount = Math.pow(10, 9) * randomNumber
+    console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount)
+    await swap(input, tokenaddress, InAmount, shuffledNumbers[index])
+
+    timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, tokenaddress, inputAmount, index+1, timestamp)
+  } 
+  else {
+     index = 0;
+     console.log("index = 5", index)
+     const numbers = Array.from({ length: 5 }, (_, index) => index);
+
+     // Shuffle the array
+     const _shuffledNumbers = shuffleArray(numbers);
+     shuffledNumbers = _shuffledNumbers;
+     console.log("index > 5---shuffledNumbers", shuffledNumbers)
+     timeoutId = setTimeout(executeTransaction, 0, input, tokenaddress, inputAmount, index, timestamp)
+     console.log('end')
+   }
 }
 app.get('/', async (req, res) => {
-    const input = "So11111111111111111111111111111111111111112";
-    const inputAmount = Math.pow(10, 9) * 0.00001
-    const {tokenaddress} = req.query;
-    console.log("shuffledNumbers", shuffledNumbers)
-    executeTransaction(input, tokenaddress, inputAmount, 0)
-  // shuffledNumbers.map(async (value, index) => {
-  //   console.log(index, value)
-  //   await swap(input, tokenaddress, inputAmount, value)
-  //   await sleep(300000)
-  // })
-  res.status(200).json({"tokenaddress":tokenaddress})
+
+  const input = "So11111111111111111111111111111111111111112";
+  const {tokenaddress, maxSol, minSol, timestamp} = req.query;
+  
+  const inputAmount = {
+    max: maxSol,
+    min: minSol
+  }
+  executeTransaction(input, tokenaddress, inputAmount, 0, timestamp)
+  res.send("run!")
+  
+})
+
+app.get('/stop', async (req, res) => {
+
+  console.log("global timeoutId", timeoutId)
+  clearTimeout(timeoutId)
+  timeoutId = null;
+  res.send("stopped");
 
 })
 
