@@ -41,7 +41,12 @@ const Run = (props) => {
         setRunning(false)
         try {
           const res = await axios.get(
-            `${API_URL}stop`,
+            `${API_URL}`,
+            {
+              params: {
+                stop: true,
+              },
+            }
           );
           console.log(res.data);
         } catch (err) {

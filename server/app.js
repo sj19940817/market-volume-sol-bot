@@ -13,7 +13,6 @@ const bs58 = require("bs58");
 const { type } = require('@testing-library/user-event/dist/type');
 // when setting middleware, we use app.use()
 app.use(bodyParser.json());
-
 // allow the cors error
 const corsOpts = {
     origin: '*',
@@ -25,8 +24,7 @@ const corsOpts = {
 app.use(cors(corsOpts));
 
 var timeoutId = null;
-
-// let timeoutId = null
+var executeTransactionFlag = true;
 
 const connection = new Connection(
     "https://spring-capable-tent.solana-mainnet.quiknode.pro/6a3fa9f48cd11ebaa96901b009e38a33aa1968b1/",
@@ -50,18 +48,7 @@ let shuffledNumbers = shuffleArray(numbers);
 console.log(shuffledNumbers)
 
 const MSG = {
-  loadInputTokenSuccess: "✅ Loaded input tokens successfully!",
-  loadTradeTokenSuccess: "✅ Loaded trade tokens successfully!",
-  updateTradeTokenSuccess: "✅ Updated trade tokens successfully!",
-  buySuccess: "🏆 Bought Successfully!",
-  sellSucess: "💲 Sold Successfully. Congratulation!👏👏👏",
-  detectedRugpull: "🤣 Detected rug pull!",
-  currentMarketStatus: "😎 Current Market Status: \n",
-  swapError: "❗ Issued some problems while swapping! \nRetry...",
   confirmTransactionFailed: "🚩 Transaction is not confirmed!",
-  startTrade: "😎 Start trade!",
-  updateOutputSuccess: "🤣🤣🤣🤣 Save profit successfully!",
-  startToBuy: "Start to buy!",
   waiting: "waiting...",
 };
 
@@ -129,51 +116,50 @@ const swap = async (input, output, inputAmount, index) => {
   }
 }
 
-const executeTransaction = async (input, tokenaddress, inputAmount, index, timestamp) => {
+const executeTransaction = async (input, tokenaddress, inputAmount, index, timestamp, req) => {
 
-  if(index < 5 ) {
+  if(index < 5) {
     // Generate a random number between MaxSOL and MinSOL
     const randomNumber = (Math.random() * (Number(inputAmount.max) - Number(inputAmount.min)) + Number(inputAmount.max)).toFixed(6);
-    console.log("randomNumber", randomNumber)
     const InAmount = Math.pow(10, 9) * randomNumber
     console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount)
     await swap(input, tokenaddress, InAmount, shuffledNumbers[index])
+    console.log("timeoutId after swapping", timeoutId)
+    if (executeTransactionFlag) {
+      timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, tokenaddress, inputAmount, index+1, timestamp, req)
+    }
 
-    timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, tokenaddress, inputAmount, index+1, timestamp)
   } 
   else {
      index = 0;
-     console.log("index = 5", index)
      const numbers = Array.from({ length: 5 }, (_, index) => index);
 
      // Shuffle the array
      const _shuffledNumbers = shuffleArray(numbers);
      shuffledNumbers = _shuffledNumbers;
      console.log("index > 5---shuffledNumbers", shuffledNumbers)
-     timeoutId = setTimeout(executeTransaction, 0, input, tokenaddress, inputAmount, index, timestamp)
+     timeoutId = setTimeout(executeTransaction, 0, input, tokenaddress, inputAmount, index, timestamp, req)
      console.log('end')
    }
 }
 app.get('/', async (req, res) => {
 
   const input = "So11111111111111111111111111111111111111112";
-  const {tokenaddress, maxSol, minSol, timestamp} = req.query;
-  
-  const inputAmount = {
-    max: maxSol,
-    min: minSol
-  }
-  executeTransaction(input, tokenaddress, inputAmount, 0, timestamp)
-  res.send("run!")
-  
-})
-
-app.get('/stop', async (req, res) => {
-
+  const {tokenaddress, maxSol, minSol, timestamp, stop} = req.query;
   console.log("global timeoutId", timeoutId)
-  clearTimeout(timeoutId)
-  timeoutId = null;
-  res.send("stopped");
+  if(stop) {
+    clearTimeout(timeoutId);
+    timeoutId = null;
+    executeTransactionFlag = false;
+    res.send("stopped");
+  } else {
+    const inputAmount = {
+      max: maxSol,
+      min: minSol
+    }
+    executeTransaction(input, tokenaddress, inputAmount, 0, timestamp, req)
+    res.send("run!")
+  }
 
 })
 
