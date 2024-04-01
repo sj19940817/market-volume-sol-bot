@@ -10,7 +10,6 @@ const {
     VersionedTransaction,
   } = require("@solana/web3.js");
 const bs58 = require("bs58");
-const { type } = require('@testing-library/user-event/dist/type');
 // when setting middleware, we use app.use()
 app.use(bodyParser.json());
 // allow the cors error
