@@ -1,3 +1,8 @@
+.buy-sell-option {
+    display: flex;
+    margin-bottom: 2em;
+}
+
 .setting {
     margin: 5em;
 }

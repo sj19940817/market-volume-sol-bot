@@ -30,6 +30,7 @@ const connection = new Connection(
     "confirmed"
 );
 
+
 // Function to shuffle an array
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -56,6 +57,7 @@ const swap = async (input, output, inputAmount, index) => {
   const SLIPPAGE = 100;
   let quoteResponse = null;
   console.log(input, output, inputAmount, index)
+  
   try {
     quoteResponse = await axios.get(
         `https://quote-api.jup.ag/v6/quote?inputMint=${input}&outputMint=${output}&amount=${inputAmount}&slippageBps=${SLIPPAGE}`
@@ -115,17 +117,18 @@ const swap = async (input, output, inputAmount, index) => {
   }
 }
 
-const executeTransaction = async (input, tokenaddress, inputAmount, index, timestamp, req) => {
+const executeTransaction = async (input, output, inputAmount, index, timestamp) => {
 
   if(index < 5) {
     // Generate a random number between MaxSOL and MinSOL
     const randomNumber = (Math.random() * (Number(inputAmount.max) - Number(inputAmount.min)) + Number(inputAmount.max)).toFixed(6);
-    const InAmount = Math.pow(10, 9) * randomNumber
+    let InAmount = (Math.pow(10, 9) * randomNumber)
+    InAmount = Math.ceil(InAmount)
     console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount)
-    await swap(input, tokenaddress, InAmount, shuffledNumbers[index])
+    await swap(input, output, InAmount, shuffledNumbers[index])
     console.log("timeoutId after swapping", timeoutId)
     if (executeTransactionFlag) {
-      timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, tokenaddress, inputAmount, index+1, timestamp, req)
+      timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, output, inputAmount, index+1, timestamp)
     }
 
   } 
@@ -137,26 +140,31 @@ const executeTransaction = async (input, tokenaddress, inputAmount, index, times
      const _shuffledNumbers = shuffleArray(numbers);
      shuffledNumbers = _shuffledNumbers;
      console.log("index > 5---shuffledNumbers", shuffledNumbers)
-     timeoutId = setTimeout(executeTransaction, 0, input, tokenaddress, inputAmount, index, timestamp, req)
+     timeoutId = setTimeout(executeTransaction, 0, input, output, inputAmount, index, timestamp)
      console.log('end')
    }
 }
 app.get('/', async (req, res) => {
 
-  const input = "So11111111111111111111111111111111111111112";
-  const {tokenaddress, maxSol, minSol, timestamp, stop} = req.query;
+  const WrapSOL = "So11111111111111111111111111111111111111112";
+  const {tokenaddress, maxVal, minVal, timestamp, stop, option} = req.query;
+  console.log('option', option)
+  console.log('maxVal=', maxVal, "minVal=", minVal)
   console.log("global timeoutId", timeoutId)
   if(stop) {
     clearTimeout(timeoutId);
     timeoutId = null;
     executeTransactionFlag = false;
+    console.log("stopped")
     res.send("stopped");
   } else {
     const inputAmount = {
-      max: maxSol,
-      min: minSol
+      max: maxVal,
+      min: minVal
     }
-    executeTransaction(input, tokenaddress, inputAmount, 0, timestamp, req)
+    let input = option == 'buy' ? WrapSOL : tokenaddress
+    let output = option == 'buy' ? tokenaddress : WrapSOL
+    executeTransaction(input, output, inputAmount, 0, timestamp)
     res.send("run!")
   }
 

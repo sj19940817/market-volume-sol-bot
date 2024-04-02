@@ -7,13 +7,17 @@ const Run = (props) => {
     const [isRunning, setRunning] = useState(false);
     const API_URL = 'http://localhost:8080/'
     const tokenaddress = props.tokenaddress
-    const maxSol = props.maxSol
-    const minSol = props.minSol
+    const maxVal = props.maxVal
+    const minVal = props.minVal
     const timestamp = props.timestamp
+    const option = props.option
 
       const handleClickStart = async () => {
-        
-        if(tokenaddress && maxSol && minSol && timestamp) {
+        if (!option) {
+          alert("Please select Buy or Sell")
+          return
+        }
+        if(tokenaddress && maxVal && minVal && timestamp) {
           setRunning(true)
           try {
             const res = await axios.get(
@@ -21,9 +25,10 @@ const Run = (props) => {
               {
                 params: {
                   tokenaddress: tokenaddress,
-                  maxSol: maxSol,
-                  minSol: minSol,
-                  timestamp: timestamp
+                  maxVal: maxVal,
+                  minVal: minVal,
+                  timestamp: timestamp,
+                  option: option
                 },
               }
             );

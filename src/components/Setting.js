@@ -7,12 +7,36 @@ import './Setting.css'
 
 const Setting = () => {
     const [tokenaddress, setTokenaddress] = useState('')
-    const [maxSol, setMaxSol] = useState(0);
-    const [minSol, setMinSol] = useState(0);
+    const [maxVal, setMaxVal] = useState(0);
+    const [minVal, setMinVal] = useState(0);
     const [timestamp, setTimestamp] = useState(0);
+    const [option, setOption] = useState('');
 
     return(
         <div className="setting">
+            {/* buy sell option */}
+            <div className="buy-sell-option">
+                <Form>
+                    <Form.Check
+                        inline
+                        label="Buy"
+                        name="group1"
+                        type="radio"
+                        id={`inline-radio-1`}
+                        onChange={() => setOption('buy')}
+                        value={option}
+                    />
+                    <Form.Check
+                        inline
+                        label="Sell"
+                        name="group1"
+                        type="radio"
+                        id={`inline-radio-2`}
+                        onChange={() => setOption('sell')}
+                        value={option}
+                    />
+                </Form>
+            </div>
             {/*Token address  */}
             <div className="tokenaddr">
                 <InputGroup size="lg" className="inputgroup">
@@ -36,10 +60,10 @@ const Setting = () => {
                         aria-describedby="inputGroup-sizing-sm"
                         type="number"
                         placeholder="0"
-                        value={maxSol}
-                        onChange={e => setMaxSol(e.target.value)}
+                        value={maxVal}
+                        onChange={e => setMaxVal(e.target.value)}
                         />
-                        <InputGroup.Text>SOL</InputGroup.Text>
+                        <InputGroup.Text>{option == 'buy' ? 'SOL' : 'Tokens'}</InputGroup.Text>
                     </InputGroup>
                     <InputGroup size="lg" className="minval">
                         <InputGroup.Text id="inputGroup-sizing-lg">Min</InputGroup.Text>
@@ -48,15 +72,15 @@ const Setting = () => {
                         aria-describedby="inputGroup-sizing-sm"
                         type="number"
                         placeholder="0"
-                        value={minSol}
-                        onChange={e => setMinSol(e.target.value)}
+                        value={minVal}
+                        onChange={e => setMinVal(e.target.value)}
                         />
-                        <InputGroup.Text>SOL</InputGroup.Text>
+                        <InputGroup.Text>{option == 'buy' ? 'SOL' : 'Tokens'}</InputGroup.Text>
                     </InputGroup>
                 </div>
                 {/* Button */}
                 <div className="run-btn"> 
-                    <Run tokenaddress={tokenaddress} maxSol={maxSol} minSol={minSol} timestamp={timestamp}/>
+                    <Run tokenaddress={tokenaddress} maxVal={maxVal} minVal={minVal} timestamp={timestamp} option={option}/>
                 </div>
             </div>
             {/* Timestamp */}
