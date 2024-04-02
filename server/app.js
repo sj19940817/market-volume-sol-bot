@@ -24,7 +24,8 @@ const corsOpts = {
 app.use(cors(corsOpts));
 
 var timeoutId = null;
-var executeTransactionFlag = true;
+var executeBuy = true;
+var executeSell = true;
 
 const connection = new Connection(
   "https://spring-capable-tent.solana-mainnet.quiknode.pro/6a3fa9f48cd11ebaa96901b009e38a33aa1968b1/",
@@ -123,14 +124,14 @@ const executeTransaction = async (input, output, inputAmount, index, timestamp, 
 
   if(index < WALLET_SECRET_KEY.length) {
     // Generate a random number between MaxVal and MinVal
-    const randomNumber = (Math.random() * (Number(inputAmount.max) - Number(inputAmount.min)) + Number(inputAmount.max)).toFixed(6);
+    const randomNumber = (Math.random() * (Number(inputAmount.max) - Number(inputAmount.min)) + Number(inputAmount.min)).toFixed(6);
     let InAmount = (Math.pow(10, Decimal) * randomNumber)
     console.log(InAmount, randomNumber, inputAmount, Decimal)
     InAmount = Math.ceil(InAmount)
     console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount)
     await swap(input, output, InAmount, shuffledNumbers[index])
-    console.log("timeoutId after swapping", timeoutId)
-    if (executeTransactionFlag) {
+    console.log("timeoutId after swapping", timeoutId, executeBuy)
+    if (executeBuy || executeSell) {
       timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, output, inputAmount, index+1, timestamp, Decimal)
     }
 
@@ -158,11 +159,13 @@ app.get('/', async (req, res) => {
   if(stop) {
     clearTimeout(timeoutId);
     timeoutId = null;
-    executeTransactionFlag = false;
-    console.log("stopped")
-    res.send("stopped");
+    if (option == 'buy') executeBuy = false
+    else if (option == 'sell') executeSell = false  
+    console.log(option+"is stopped")
+    res.send(`${option} is stopped`);
   } else {
-    
+    if (option == 'buy') executeBuy = true
+    else if (option == 'sell') executeSell = true  
     let tokeninfo = await connection.getParsedAccountInfo(
       new PublicKey(tokenaddress)
     )
