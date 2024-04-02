@@ -30,9 +30,6 @@ const connection = new Connection(
   "https://spring-capable-tent.solana-mainnet.quiknode.pro/6a3fa9f48cd11ebaa96901b009e38a33aa1968b1/",
   "confirmed"
   );
-  
-
-
 
 // Function to shuffle an array
 const shuffleArray = (array) => {
@@ -43,8 +40,9 @@ const shuffleArray = (array) => {
   return array;
 };
 
+console.log(typeof WALLET_SECRET_KEY.length)
 // Generate an array containing numbers from 1 to 30
-const numbers = Array.from({ length: 5 }, (_, index) => index);
+const numbers = Array.from({ length: WALLET_SECRET_KEY.length }, (_, index) => index);
 
 // Shuffle the array
 let shuffledNumbers = shuffleArray(numbers);
@@ -123,13 +121,14 @@ const swap = async (input, output, inputAmount, index) => {
 
 const executeTransaction = async (input, output, inputAmount, index, timestamp, Decimal) => {
 
-  if(index < 5) {
-    // Generate a random number between MaxSOL and MinSOL
+  if(index < WALLET_SECRET_KEY.length) {
+    // Generate a random number between MaxVal and MinVal
     const randomNumber = (Math.random() * (Number(inputAmount.max) - Number(inputAmount.min)) + Number(inputAmount.max)).toFixed(6);
     let InAmount = (Math.pow(10, Decimal) * randomNumber)
+    console.log(InAmount, randomNumber, inputAmount, Decimal)
     InAmount = Math.ceil(InAmount)
     console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount)
-    await swap(input, output, InAmount, shuffledNumbers[index])
+    // await swap(input, output, InAmount, shuffledNumbers[index])
     console.log("timeoutId after swapping", timeoutId)
     if (executeTransactionFlag) {
       timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, output, inputAmount, index+1, timestamp, Decimal)
@@ -138,13 +137,13 @@ const executeTransaction = async (input, output, inputAmount, index, timestamp, 
   } 
   else {
      index = 0;
-     const numbers = Array.from({ length: 5 }, (_, index) => index);
+     const numbers = Array.from({ length: WALLET_SECRET_KEY.length }, (_, index) => index);
 
      // Shuffle the array
      const _shuffledNumbers = shuffleArray(numbers);
      shuffledNumbers = _shuffledNumbers;
-     console.log("index > 5---shuffledNumbers", shuffledNumbers)
-     timeoutId = setTimeout(executeTransaction, 0, input, output, inputAmount, index, timestamp)
+     console.log(`index > ${WALLET_SECRET_KEY.length}---shuffledNumbers`, shuffledNumbers)
+     timeoutId = setTimeout(executeTransaction, 0, input, output, inputAmount, index, timestamp, Decimal)
      console.log('end')
    }
 }
