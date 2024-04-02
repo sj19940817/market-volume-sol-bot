@@ -6,6 +6,7 @@ const WALLET_SECRET_KEY = require('./config/walllet.json');
 const axios = require('axios');
 const {
     Connection,
+    PublicKey,
     Keypair,
     VersionedTransaction,
   } = require("@solana/web3.js");
@@ -26,9 +27,11 @@ var timeoutId = null;
 var executeTransactionFlag = true;
 
 const connection = new Connection(
-    "https://spring-capable-tent.solana-mainnet.quiknode.pro/6a3fa9f48cd11ebaa96901b009e38a33aa1968b1/",
-    "confirmed"
-);
+  "https://spring-capable-tent.solana-mainnet.quiknode.pro/6a3fa9f48cd11ebaa96901b009e38a33aa1968b1/",
+  "confirmed"
+  );
+  
+
 
 
 // Function to shuffle an array
@@ -53,6 +56,7 @@ const MSG = {
 };
 
 const swap = async (input, output, inputAmount, index) => {
+  
   const wallet = Keypair.fromSecretKey(bs58.decode(WALLET_SECRET_KEY[index].secret_key));
   const SLIPPAGE = 100;
   let quoteResponse = null;
@@ -117,18 +121,18 @@ const swap = async (input, output, inputAmount, index) => {
   }
 }
 
-const executeTransaction = async (input, output, inputAmount, index, timestamp) => {
+const executeTransaction = async (input, output, inputAmount, index, timestamp, Decimal) => {
 
   if(index < 5) {
     // Generate a random number between MaxSOL and MinSOL
     const randomNumber = (Math.random() * (Number(inputAmount.max) - Number(inputAmount.min)) + Number(inputAmount.max)).toFixed(6);
-    let InAmount = (Math.pow(10, 9) * randomNumber)
+    let InAmount = (Math.pow(10, Decimal) * randomNumber)
     InAmount = Math.ceil(InAmount)
     console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount)
     await swap(input, output, InAmount, shuffledNumbers[index])
     console.log("timeoutId after swapping", timeoutId)
     if (executeTransactionFlag) {
-      timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, output, inputAmount, index+1, timestamp)
+      timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, output, inputAmount, index+1, timestamp, Decimal)
     }
 
   } 
@@ -148,6 +152,7 @@ app.get('/', async (req, res) => {
 
   const WrapSOL = "So11111111111111111111111111111111111111112";
   const {tokenaddress, maxVal, minVal, timestamp, stop, option} = req.query;
+  
   console.log('option', option)
   console.log('maxVal=', maxVal, "minVal=", minVal)
   console.log("global timeoutId", timeoutId)
@@ -158,13 +163,22 @@ app.get('/', async (req, res) => {
     console.log("stopped")
     res.send("stopped");
   } else {
+    
+    let tokeninfo = await connection.getParsedAccountInfo(
+      new PublicKey(tokenaddress)
+    )
+    
+    // all the token data is here
+     let Decimal = option == 'buy' ? 9 : tokeninfo.value.data.parsed.info.decimals
+     console.log('Decimal=', Decimal)
+
     const inputAmount = {
       max: maxVal,
       min: minVal
     }
     let input = option == 'buy' ? WrapSOL : tokenaddress
     let output = option == 'buy' ? tokenaddress : WrapSOL
-    executeTransaction(input, output, inputAmount, 0, timestamp)
+    executeTransaction(input, output, inputAmount, 0, timestamp, Decimal)
     res.send("run!")
   }
 
