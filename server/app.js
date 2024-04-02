@@ -128,7 +128,7 @@ const executeTransaction = async (input, output, inputAmount, index, timestamp, 
     console.log(InAmount, randomNumber, inputAmount, Decimal)
     InAmount = Math.ceil(InAmount)
     console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount)
-    // await swap(input, output, InAmount, shuffledNumbers[index])
+    await swap(input, output, InAmount, shuffledNumbers[index])
     console.log("timeoutId after swapping", timeoutId)
     if (executeTransactionFlag) {
       timeoutId = setTimeout(executeTransaction, timestamp * 1000, input, output, inputAmount, index+1, timestamp, Decimal)
