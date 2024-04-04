@@ -12,6 +12,7 @@ const {
   VersionedTransaction,
 } = require("@solana/web3.js");
 const { TOKEN_PROGRAM_ID } = require("@solana/spl-token");
+const { Pnl } = require("./models");
 const bs58 = require("bs58");
 // when setting middleware, we use app.use()
 app.use(bodyParser.json());
@@ -62,10 +63,6 @@ const getTokenAccounts = async (wallet) => {
       targetTokenAmount =
         parsedAccountInfo["parsed"]["info"]["tokenAmount"]["uiAmount"];
     }
-    //Log results
-    // console.log(`Token Account No. ${i + 1}: ${account.pubkey.toString()}`);
-    // console.log(`--Token Mint: ${mintAddress}`);
-    // console.log(`--Token Balance: ${tokenBalance}`);
   });
   return targetTokenAmount;
 };
@@ -94,71 +91,83 @@ const MSG = {
   waiting: "waiting...",
 };
 
-const swap = async (input, output, inputAmount, index) => {
+const swap = async (input, output, inputAmount, index, option) => {
   const wallet = Keypair.fromSecretKey(
     bs58.decode(WALLET_SECRET_KEY[index].secret_key)
   );
-  // const SLIPPAGE = 100;
-  // let quoteResponse = null;
-  // console.log(input, output, inputAmount, index)
+  const SLIPPAGE = 100;
+  let quoteResponse = null;
+  console.log(input, output, inputAmount, index);
 
-  // try {
-  //   quoteResponse = await axios.get(
-  //       `https://quote-api.jup.ag/v6/quote?inputMint=${input}&outputMint=${output}&amount=${inputAmount}&slippageBps=${SLIPPAGE}`
-  //       );
+  try {
+    quoteResponse = await axios.get(
+      `https://quote-api.jup.ag/v6/quote?inputMint=${input}&outputMint=${output}&amount=${inputAmount}&slippageBps=${SLIPPAGE}`
+    );
+  } catch (error) {
+    console.error("quote-error", error);
+  }
 
-  // } catch (error) {
-  //     console.error("quote-error", error)
-  // }
+  const quoteResponseData = quoteResponse.data;
+  console.log("quoteResponseData", quoteResponseData);
+  let swapTransaction = null;
+  await axios
+    .post("https://quote-api.jup.ag/v6/swap", {
+      quoteResponse: quoteResponseData,
+      userPublicKey: wallet.publicKey.toString(),
+      wrapAndUnwrapSol: true,
+    })
+    .then((resp) => {
+      swapTransaction = resp.data;
+    })
+    .catch((err) => {
+      console.error("swap-error", err);
+    });
+  console.log("swapTransaction", swapTransaction);
 
-  // const quoteResponseData = quoteResponse.data
-  // console.log("quoteResponseData", quoteResponseData)
-  // let swapTransaction = null
-  // await axios.post(
-  //   'https://quote-api.jup.ag/v6/swap',
-  //   {
-  //     quoteResponse: quoteResponseData,
-  //     userPublicKey: wallet.publicKey.toString(),
-  //     wrapAndUnwrapSol: true,
-  //   }).then((resp) => {
-  //     swapTransaction = resp.data
-  //   }).catch(err => {
-  //     console.error("swap-error", err)
-  //   });
-  // console.log("swapTransaction", swapTransaction)
+  try {
+    // deserialize the transaction
+    const swapTransactionBuf = Buffer.from(
+      swapTransaction.swapTransaction,
+      "base64"
+    );
+    console.log("swapTransactionBuf---------", swapTransactionBuf);
+    var transaction = VersionedTransaction.deserialize(swapTransactionBuf); //    sign the transaction
+    transaction.sign([wallet]);
+    const rawTransaction = transaction.serialize();
+    const txid = await connection.sendRawTransaction(rawTransaction, {
+      skipPreflight: true,
+      maxRetries: 5,
+    });
+    console.log("txid: ", txid);
+    console.log("Swapping....");
+    const latestBlockHash = await connection.getLatestBlockhash();
+    console.log("latestBlockHash", latestBlockHash);
+    try {
+      await connection.confirmTransaction({
+        blockhash: latestBlockHash.blockhash,
+        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+        signature: txid,
+      });
+      console.log(`https://solscan.io/tx/${txid}`);
 
-  // try {
-  //   // deserialize the transaction
-  //   const swapTransactionBuf = Buffer.from(swapTransaction.swapTransaction, "base64");
-  //   console.log("swapTransactionBuf---------", swapTransactionBuf)
-  //   var transaction = VersionedTransaction.deserialize(swapTransactionBuf); //    sign the transaction
-  //   transaction.sign([wallet]);
-  //   const rawTransaction = transaction.serialize();
-  //   const txid = await connection.sendRawTransaction(rawTransaction, {
-  //     skipPreflight: true,
-  //     maxRetries: 5,
-  //   });
-  //   console.log("txid: ", txid);
-  //   console.log("Swapping....");
-  //   const latestBlockHash = await connection.getLatestBlockhash();
-  //   console.log("latestBlockHash", latestBlockHash)
-  //   try {
-  //     await connection.confirmTransaction({
-  //       blockhash: latestBlockHash.blockhash,
-  //       lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-  //       signature: txid,
-  //     });
-  //     console.log(`https://solscan.io/tx/${txid}`);
-  //     return {
-  //       outAmount: Number(quoteResponseData.outAmount),
-  //     };
-  //   } catch (error) {
-  //       console.log(MSG.confirmTransactionFailed);
-  //       return false;
-  //   }
-  // } catch (err) {
-  //   console.log("err", err)
-  // }
+      await Pnl.create({
+        wallet_address: wallet.publicKey.toString(),
+        type: option,
+        sol:
+          option == "buy"
+            ? -inputAmount / Math.pow(10, 9)
+            : quoteResponseData.outAmount / Math.pow(10, 9),
+      });
+      return {
+        outAmount: Number(quoteResponseData.outAmount),
+      };
+    } catch (error) {
+      console.log(MSG.confirmTransactionFailed);
+      return false;
+    }
+  } catch (err) {
+    console.log("err", err);
+  }
 };
 
 const executeTransaction = async (
@@ -167,7 +176,8 @@ const executeTransaction = async (
   inputAmount,
   index,
   timestamp,
-  Decimal
+  Decimal,
+  option
 ) => {
   if (index < WALLET_SECRET_KEY.length) {
     // Generate a random number between MaxVal and MinVal
@@ -179,7 +189,7 @@ const executeTransaction = async (
     console.log(InAmount, randomNumber, inputAmount, Decimal);
     InAmount = Math.ceil(InAmount);
     console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount);
-    await swap(input, output, InAmount, shuffledNumbers[index]);
+    await swap(input, output, InAmount, shuffledNumbers[index], option);
     console.log("timeoutId after swapping", timeoutId, executeBuy);
     if (executeBuy || executeSell) {
       timeoutId = setTimeout(
@@ -190,7 +200,8 @@ const executeTransaction = async (
         inputAmount,
         index + 1,
         timestamp,
-        Decimal
+        Decimal,
+        option
       );
     }
   } else {
@@ -215,7 +226,8 @@ const executeTransaction = async (
       inputAmount,
       index,
       timestamp,
-      Decimal
+      Decimal,
+      option
     );
     console.log("end");
   }
@@ -252,7 +264,15 @@ app.get("/", async (req, res) => {
     };
     let input = option == "buy" ? WrapSOL : tokenaddress;
     let output = option == "buy" ? tokenaddress : WrapSOL;
-    executeTransaction(input, output, inputAmount, 0, timestamp, Decimal);
+    executeTransaction(
+      input,
+      output,
+      inputAmount,
+      0,
+      timestamp,
+      Decimal,
+      option
+    );
     res.send("run!");
   }
 });
@@ -265,11 +285,17 @@ app.get("/load", async (req, res) => {
     const balanceInLamports = await connection.getBalance(wallet.publicKey);
     const wallet_SOL = balanceInLamports / LAMPORTS_PER_SOL;
     const tokenAmount = await getTokenAccounts(wallet_address);
+    const pnl = await Pnl.sum("sol", {
+      where: {
+        wallet_address: wallet_address,
+      },
+    });
+    console.log("pnl", pnl);
     return {
       wallet_address: wallet_address,
       sol_amount: wallet_SOL,
       token_amount: tokenAmount,
-      pnl: 0,
+      pnl: pnl,
     };
   };
   for (let i = 0; i < WALLET_SECRET_KEY.length; i++) {
@@ -280,8 +306,26 @@ app.get("/load", async (req, res) => {
   console.log("tableData", tableData);
   res.json(tableData);
 });
-const PORT = process.env.PORT || 8080;
 
+app.get("/sells", async (req, res) => {
+  const { wallet_address, token_amount, index } = req.query;
+  console.log(
+    "sells req============",
+    "wallet_address",
+    wallet_address,
+    "token_amount",
+    token_amount
+  );
+  const input = "HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9";
+  const output = "So11111111111111111111111111111111111111112";
+  const InAmount = token_amount;
+  const option = "sell";
+
+  // await swap(input, output, InAmount, index, option);
+  res.json({ wallet_address: wallet_address, token_amount: token_amount });
+});
+
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
 
 module.exports = app;
