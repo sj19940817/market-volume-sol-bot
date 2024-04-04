@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Run from "./Run";
 import "./Auto.css";
 
 const Auto = () => {
-  const [tokenaddress, setTokenaddress] = useState("");
   const [maxVal, setMaxVal] = useState(0);
   const [minVal, setMinVal] = useState(0);
   const [timestamp, setTimestamp] = useState(0);
@@ -13,21 +12,6 @@ const Auto = () => {
 
   return (
     <div className="setting">
-      {/*Token address  */}
-      <div className="tokenaddr">
-        <InputGroup size="lg" className="inputgroup">
-          <InputGroup.Text id="inputGroup-sizing-lg">
-            Token Address
-          </InputGroup.Text>
-          <Form.Control
-            aria-label="Large"
-            aria-describedby="inputGroup-sizing-sm"
-            placeholder="HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9"
-            value={tokenaddress}
-            onChange={(e) => setTokenaddress(e.target.value)}
-          />
-        </InputGroup>
-      </div>
       {/* buy sell option */}
       <div className="buy-sell-option">
         <p className="title">Auto Bot</p>
@@ -101,7 +85,7 @@ const Auto = () => {
       {/* Button */}
       <div className="run-btn">
         <Run
-          tokenaddress={tokenaddress}
+          tokenaddress={"tokenaddress"}
           maxVal={maxVal}
           minVal={minVal}
           timestamp={timestamp}

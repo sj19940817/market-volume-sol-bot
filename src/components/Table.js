@@ -42,10 +42,10 @@ const TablePagination = () => {
           <tr>
             <th>No</th>
             <th>Wallet Address</th>
-            <th>Action</th>
             <th>SOL Amount</th>
             <th>Token Amount</th>
             <th>PNL</th>
+            <th>Close</th>
           </tr>
         </thead>
         <tbody>
@@ -55,13 +55,18 @@ const TablePagination = () => {
               <td style={{ textAlign: "center", verticalAlign: "middle" }}>
                 {row.wallet_address}
               </td>
+              <td>{`${row.sol_amount.toFixed(4)} SOL`}</td>
+              <td>{row.token_amount.toFixed(4)}</td>
+              <td>{row.pnl.toFixed(6)}</td>
               <td>
                 {
                   <Button
-                    variant="secondary"
                     style={{
                       marginTop: "0",
                       fontSize: "15px",
+                      backgroundColor: "red",
+                      borderColor: "red",
+                      fontWeight: "600",
                     }}
                     size="sm"
                     onClick={() =>
@@ -72,13 +77,10 @@ const TablePagination = () => {
                       })
                     }
                   >
-                    Sells All
+                    Close Wallet
                   </Button>
                 }
               </td>
-              <td>{`${row.sol_amount.toFixed(4)} SOL`}</td>
-              <td>{row.token_amount.toFixed(4)}</td>
-              <td>{row.pnl.toFixed(6)}</td>
             </tr>
           ))}
         </tbody>

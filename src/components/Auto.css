@@ -1,7 +1,3 @@
-.tokenaddr {
-  margin-top: 2em;
-}
-
 .buy-sell-option {
   display: flex;
   margin-top: 1.5em;
@@ -16,10 +12,6 @@
 
 .setting {
   margin: 1em 5em 0 5em;
-}
-
-.inputgroup {
-  width: 65% !important;
 }
 
 .max-min-val {
@@ -39,7 +31,7 @@
 
 .timestamp {
   margin-top: 1em;
-  width: 25% !important;
+  width: 80% !important;
 }
 
 .run-btn {
