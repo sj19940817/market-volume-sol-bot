@@ -4,7 +4,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Run from "./Run";
 import "./Auto.css";
 
-const Auto = () => {
+const Auto = (props) => {
   const [maxVal, setMaxVal] = useState(0);
   const [minVal, setMinVal] = useState(0);
   const [timestamp, setTimestamp] = useState(0);
@@ -85,11 +85,12 @@ const Auto = () => {
       {/* Button */}
       <div className="run-btn">
         <Run
-          tokenaddress={"tokenaddress"}
+          tokenaddress={props.tokenaddress}
           maxVal={maxVal}
           minVal={minVal}
           timestamp={timestamp}
           option={option}
+          setFetchCount={props.setFetchCount}
         />
       </div>
     </div>

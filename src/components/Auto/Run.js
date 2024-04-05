@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import axios from "axios";
 
 const Run = (props) => {
+  const { setFetchCount } = props;
   const [isRunning, setRunning] = useState(false);
   const API_URL = "http://localhost:8080/";
   const tokenaddress = props.tokenaddress;
@@ -29,6 +30,7 @@ const Run = (props) => {
             option: option,
           },
         });
+        setTimeout(needToRefresh, timestamp * 1000);
         console.log(res.data);
       } catch (err) {
         console.log("error");
@@ -50,6 +52,17 @@ const Run = (props) => {
     } catch (err) {
       console.log("error");
     }
+  };
+
+  const needToRefresh = () => {
+    setRunning((prev) => {
+      console.log("prev", prev);
+      if (prev) {
+        setFetchCount((prev) => prev + 1);
+        setTimeout(needToRefresh, timestamp * 1000);
+        return prev;
+      }
+    });
   };
   return (
     <Button

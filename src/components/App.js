@@ -1,23 +1,36 @@
 import "./App.css";
-import Nav from "./Nav";
-import Auto from "./Auto";
+import Nav from "./Nav/Nav";
+import Auto from "./Auto/Auto";
 import Table from "./Table";
-import Token from "./Token";
+import Token from "./Token/Token";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Manual from "./Manual";
-import Position from "./Position";
+import Manual from "./Manual/Manual";
+import Position from "./Position/Position";
+import { useState } from "react";
 
 function App() {
+  const [tokenaddress, setTokenAddress] = useState("");
+  const [fetchCount, setFetchCount] = useState(0);
+  const [tableData, setTableData] = useState([]);
+  const [closelist, setCloseList] = useState([]);
+  console.log(tokenaddress);
   return (
     <div className="App">
       <Nav />
-      <Token />
+      <Token tokenaddress={tokenaddress} setTokenAddress={setTokenAddress} />
       <div style={{ display: "flex", justifyCcontent: "left" }}>
-        <Auto />
-        <Manual />
-        <Position />
+        <Auto tokenaddress={tokenaddress} setFetchCount={setFetchCount} />
+        <Manual tokenaddress={tokenaddress} setFetchCount={setFetchCount} />
+        <Position tableData={tableData} tokenaddress={tokenaddress} />
       </div>
-      <Table />
+      <Table
+        tokenaddress={tokenaddress}
+        tableData={tableData}
+        setTableData={setTableData}
+        closelist={closelist}
+        setCloseList={setCloseList}
+        fetchCount={fetchCount}
+      />
     </div>
   );
 }

@@ -25,3 +25,8 @@
 .position-container .p-item span {
   margin-left: 20px;
 }
+
+.position-sell:hover {
+  background-color: darkred !important;
+  border-color: darkred !important;
+}

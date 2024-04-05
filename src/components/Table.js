@@ -4,36 +4,26 @@ import Button from "react-bootstrap/Button";
 import LoaderIcon from "react-loader-icon";
 import axios from "axios";
 
-const TablePagination = () => {
+const TablePagination = (props) => {
   const API_URL = "http://localhost:8080/";
-  const [tableData, setTableData] = useState([]);
 
   const fetchData = async () => {
-    const res = await axios.get(`${API_URL}load`);
-    setTableData(res.data);
+    const res = await axios.get(`${API_URL}load`, {
+      params: {
+        token_address: props.tokenaddress,
+      },
+    });
+    props.setTableData(res.data);
   };
 
-  const handleSellsALL = async (param) => {
-    console.log(param);
-    try {
-      const res = await axios.get(`${API_URL}sells`, {
-        params: {
-          wallet_address: param.wallet_address,
-          token_amount: param.token_amount,
-          index: param.index,
-        },
-      });
-      console.log(res.data);
-    } catch (err) {
-      console.log("error");
-    }
-  };
+  const handleClose = async (param) => {};
 
   useEffect(() => {
+    console.log("props.fetchCount", props.fetchCount);
     fetchData();
-  }, []);
+  }, [props.fetchCount]);
 
-  return tableData.length == 0 ? (
+  return props.tableData.length == 0 ? (
     <LoaderIcon type={"spokes"} style={{ marginTop: "5em" }} />
   ) : (
     <div className="container mt-5">
@@ -49,11 +39,17 @@ const TablePagination = () => {
           </tr>
         </thead>
         <tbody>
-          {tableData.map((row, index) => (
+          {props.tableData.map((row, index) => (
             <tr key={index + 1}>
               <td>{index + 1}</td>
               <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-                {row.wallet_address}
+                <a
+                  href={`https://solscan.io/account/${row.wallet_address}`}
+                  style={{ textDecoration: "none", color: "#000000" }}
+                  target="_blank"
+                >
+                  {row.wallet_address}
+                </a>
               </td>
               <td>{`${row.sol_amount.toFixed(4)} SOL`}</td>
               <td>{row.token_amount.toFixed(4)}</td>
@@ -70,7 +66,7 @@ const TablePagination = () => {
                     }}
                     size="sm"
                     onClick={() =>
-                      handleSellsALL({
+                      handleClose({
                         wallet_address: row.wallet_address,
                         token_amount: row.token_amount,
                         index: index,
