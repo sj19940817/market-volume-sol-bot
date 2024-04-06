@@ -7,6 +7,8 @@ import axios from "axios";
 
 const Manual = (props) => {
   const [value, setValue] = useState(0);
+  const [isBuyRunning, setIsBuyRunning] = useState(false);
+  const [isSellRunning, setIsSellRunning] = useState(false);
   const API_URL = "http://localhost:8080/";
   const tokenaddress = props.tokenaddress;
 
@@ -19,6 +21,7 @@ const Manual = (props) => {
       alert("Please input sol amount");
       return;
     }
+    setIsBuyRunning(true);
     try {
       const res = await axios.get(`${API_URL}manual`, {
         params: {
@@ -28,6 +31,7 @@ const Manual = (props) => {
         },
       });
       props.setFetchCount((prev) => prev + 1);
+      if (res.data) setIsBuyRunning(false);
     } catch (error) {}
   };
 
@@ -37,9 +41,10 @@ const Manual = (props) => {
       return;
     }
     if (value == 0) {
-      alert("Please input sol amount");
+      alert("Please input Token amount");
       return;
     }
+    setIsSellRunning(true);
     try {
       const res = await axios.get(`${API_URL}manual`, {
         params: {
@@ -48,6 +53,8 @@ const Manual = (props) => {
           tokenaddress: tokenaddress,
         },
       });
+      props.setFetchCount((prev) => prev + 1);
+      if (res.data) setIsSellRunning(false);
     } catch (error) {}
   };
 
@@ -76,8 +83,9 @@ const Manual = (props) => {
           }}
           className="manual-buy-btn"
           onClick={() => handleBuy()}
+          disabled={isBuyRunning ? true : false}
         >
-          Buy
+          {isBuyRunning ? "Buying" : "Buy"}
         </Button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <Button
@@ -90,8 +98,9 @@ const Manual = (props) => {
           }}
           className="manual-sell-btn"
           onClick={() => handleSell()}
+          disabled={isSellRunning ? true : false}
         >
-          Sell
+          {isSellRunning ? "Selling" : "Sell"}
         </Button>
       </div>
     </div>

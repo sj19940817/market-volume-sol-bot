@@ -16,3 +16,7 @@
   background-color: darkred !important;
   border-color: darkred !important;
 }
+
+.manual-buy-btn .manual-sell-btn {
+  width: 95px;
+}

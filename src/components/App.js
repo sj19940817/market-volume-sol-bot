@@ -13,7 +13,6 @@ function App() {
   const [fetchCount, setFetchCount] = useState(0);
   const [tableData, setTableData] = useState([]);
   const [closelist, setCloseList] = useState([]);
-  console.log(tokenaddress);
   return (
     <div className="App">
       <Nav />
@@ -21,7 +20,11 @@ function App() {
       <div style={{ display: "flex", justifyCcontent: "left" }}>
         <Auto tokenaddress={tokenaddress} setFetchCount={setFetchCount} />
         <Manual tokenaddress={tokenaddress} setFetchCount={setFetchCount} />
-        <Position tableData={tableData} tokenaddress={tokenaddress} />
+        <Position
+          tableData={tableData}
+          tokenaddress={tokenaddress}
+          setFetchCount={setFetchCount}
+        />
       </div>
       <Table
         tokenaddress={tokenaddress}

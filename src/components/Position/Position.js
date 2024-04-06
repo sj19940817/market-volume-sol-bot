@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Position.css";
 import { Button } from "react-bootstrap";
 import axios from "axios";
 
 const Position = (props) => {
+  const [sellall, setSellALL] = useState(false);
   const API_URL = "http://localhost:8080/";
   let total_SOL = 0;
   let total_Token = 0;
@@ -23,6 +24,7 @@ const Position = (props) => {
       alert("Please input Token address");
       return;
     }
+    setSellALL(true);
     try {
       const res = await axios.get(`${API_URL}sellsall`, {
         params: {
@@ -31,6 +33,8 @@ const Position = (props) => {
         },
       });
       console.log(res.data);
+      props.setFetchCount((prev) => prev + 1);
+      if (res.data) setSellALL(false);
     } catch (err) {
       console.log("error");
     }
@@ -63,9 +67,9 @@ const Position = (props) => {
         }}
         className="position-sell"
         onClick={() => handleSellAll()}
-        disabled={total_Token.toFixed(3) == 0 ? true : false}
+        disabled={total_Token.toFixed(3) == 0 || sellall ? true : false}
       >
-        SELL ALL
+        {sellall ? "SELLING" : "SELL ALL"}
       </Button>
     </div>
   );
