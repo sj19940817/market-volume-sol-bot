@@ -13,7 +13,7 @@ const Token = (props) => {
         <Form.Control
           aria-label="Large"
           aria-describedby="inputGroup-sizing-sm"
-          placeholder="HLptm5e6rTgh4EKgDpYFrnRHbjpkMyVdEeREEa2G7rf9"
+          placeholder={props.tokenaddress}
           value={props.tokenaddress}
           onChange={(e) => props.setTokenAddress(e.target.value)}
         />

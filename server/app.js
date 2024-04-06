@@ -193,7 +193,7 @@ app.get("/manual", async (req, res) => {
 });
 
 app.get("/load", async (req, res) => {
-  const { tokenaddress } = req.query;
+  const { token_address } = req.query;
   let tableData = [];
   const getItem = async (private_key) => {
     const wallet = Keypair.fromSecretKey(bs58.decode(private_key.secret_key));
@@ -204,7 +204,7 @@ app.get("/load", async (req, res) => {
     const tokenAmount = await getTokenAccounts(
       wallet_address,
       connection,
-      tokenaddress
+      token_address
     );
     const pnl = await Pnl.sum("sol", {
       where: {

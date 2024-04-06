@@ -5,6 +5,7 @@ module.exports = function (sequelize, Sequalize) {
       wallet_address: Sequalize.STRING,
       type: Sequalize.STRING,
       sol: Sequalize.NUMBER,
+      token_address: Sequalize.STRING,
     },
     {
       timestamps: false,

@@ -86,6 +86,7 @@ const swap = async (input, output, inputAmount, index, option) => {
           option == "buy"
             ? -inputAmount / Math.pow(10, 9)
             : quoteResponseData.outAmount / Math.pow(10, 9),
+        token_address: option == "buy" ? output : input,
       });
       return {
         outAmount: Number(quoteResponseData.outAmount),
