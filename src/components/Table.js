@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import LoaderIcon from "react-loader-icon";
+import { API_URL } from "./config";
 import axios from "axios";
 
 const TablePagination = (props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const API_URL = "http://localhost:8080/";
 
   const fetchData = async () => {
     setIsLoading(true);

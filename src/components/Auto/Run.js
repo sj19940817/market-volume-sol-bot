@@ -1,12 +1,12 @@
 import React from "react";
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
+import { API_URL } from "../config";
 import axios from "axios";
 
 const Run = (props) => {
   const { setFetchCount } = props;
   const [isRunning, setRunning] = useState(false);
-  const API_URL = "http://localhost:8080/";
   const tokenaddress = props.tokenaddress;
   const maxVal = props.maxVal;
   const minVal = props.minVal;

@@ -4,12 +4,12 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import "./Manual.css";
 import axios from "axios";
+import { API_URL } from "../config";
 
 const Manual = (props) => {
   const [value, setValue] = useState(0);
   const [isBuyRunning, setIsBuyRunning] = useState(false);
   const [isSellRunning, setIsSellRunning] = useState(false);
-  const API_URL = "http://localhost:8080/";
   const tokenaddress = props.tokenaddress;
 
   const handleBuy = async () => {
@@ -80,6 +80,7 @@ const Manual = (props) => {
             fontWeight: "600",
             width: "80px",
             fontSize: "20px",
+            marginRight: "1em",
           }}
           className="manual-buy-btn"
           onClick={() => handleBuy()}
@@ -87,13 +88,12 @@ const Manual = (props) => {
         >
           {isBuyRunning ? "Buying" : "Buy"}
         </Button>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <Button
           style={{
             backgroundColor: "red",
             borderColor: "red",
             fontWeight: "600",
-            width: "80px",
+            width: "85px",
             fontSize: "20px",
           }}
           className="manual-sell-btn"

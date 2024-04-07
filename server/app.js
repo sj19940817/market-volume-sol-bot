@@ -1,8 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const bs58 = require("bs58");
+const API = process.env.API_URL;
+console.log("API", API);
 
 // import wallet private key
 const WALLET_SECRET_KEY = require("./config/walllet.json");
@@ -174,10 +177,8 @@ app.get("/manual", async (req, res) => {
   // all the token data is here
   let Decimal = option == "buy" ? 9 : tokeninfo.value.data.parsed.info.decimals;
   console.log("Decimal=", Decimal);
-  const InAmount = (
-    (Math.pow(10, Decimal) * amount) /
-    WALLET_SECRET_KEY.length
-  ).toFixed(6);
+  const InAmount =
+    (Math.pow(10, Decimal) * amount) / WALLET_SECRET_KEY.length.toFixed(6);
 
   if (option == "buy") {
     input = WrapSOL;
@@ -190,7 +191,7 @@ app.get("/manual", async (req, res) => {
   for (let index = 0; index < WALLET_SECRET_KEY.length; index++) {
     console.log("Manual", InAmount);
 
-    // await swap(input, output, InAmount, index, option);
+    await swap(input, output, InAmount, index, option);
   }
   console.log("manual finished");
   res.json("manual");

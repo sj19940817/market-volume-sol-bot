@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import "./Position.css";
 import { Button } from "react-bootstrap";
 import axios from "axios";
+import { API_URL } from "../config";
 
 const Position = (props) => {
   const [sellall, setSellALL] = useState(false);
-  const API_URL = "http://localhost:8080/";
   let total_SOL = 0;
   let total_Token = 0;
   let total_PNL = 0;
