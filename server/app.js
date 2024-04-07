@@ -200,7 +200,6 @@ app.get("/load", async (req, res) => {
   let tableData = [];
   const getItem = async (private_key) => {
     const wallet = Keypair.fromSecretKey(bs58.decode(private_key.secret_key));
-    console.log("wallet", wallet.publicKey);
     const wallet_address = wallet.publicKey.toString();
     const balanceInLamports = await connection.getBalance(wallet.publicKey);
     const wallet_SOL = balanceInLamports / LAMPORTS_PER_SOL;
@@ -223,7 +222,6 @@ app.get("/load", async (req, res) => {
   };
   for (let i = 0; i < WALLET_SECRET_KEY.length; i++) {
     const item = await getItem(WALLET_SECRET_KEY[i]);
-    console.log("item", item);
     tableData.push(item);
   }
   res.json(tableData);
@@ -238,8 +236,6 @@ app.get("/sellsall", async (req, res) => {
 
   // all the token data is here
   let Decimal = tokeninfo.value.data.parsed.info.decimals;
-  console.log("Decimal=", Decimal);
-
   const output = WrapSOL;
   const option = "sell";
   console.log(token_amount_list);
@@ -250,7 +246,6 @@ app.get("/sellsall", async (req, res) => {
     } else {
       console.log("Already Sold");
     }
-    console.log(token_amount_list[index]);
   }
   console.log("all positions ended");
   res.json("All positions end");
