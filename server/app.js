@@ -4,8 +4,6 @@ const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const bs58 = require("bs58");
-const API = process.env.API_URL;
-console.log("API", API);
 
 // import wallet private key
 const WALLET_SECRET_KEY = require("./config/walllet.json");

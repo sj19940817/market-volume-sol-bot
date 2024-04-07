@@ -78,7 +78,7 @@ const Manual = (props) => {
             backgroundColor: "chartreuse",
             borderColor: "chartreuse",
             fontWeight: "600",
-            width: "80px",
+            width: "85px",
             fontSize: "20px",
             marginRight: "1em",
           }}
