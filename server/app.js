@@ -72,7 +72,7 @@ const executeTransaction = async (
     const randomNumber = (
       Math.random() * (Number(inputAmount.max) - Number(inputAmount.min)) +
       Number(inputAmount.min)
-    ).toFixed(6);
+    ).toFixed(3);
     let InAmount = Math.pow(10, Decimal) * randomNumber;
     InAmount = Math.ceil(InAmount);
     console.log(`wallet${shuffledNumbers[index]}'s inputamount`, InAmount);
@@ -176,7 +176,7 @@ app.get("/manual", async (req, res) => {
   let Decimal = option == "buy" ? 9 : tokeninfo.value.data.parsed.info.decimals;
   console.log("Decimal=", Decimal);
   const InAmount =
-    (Math.pow(10, Decimal) * amount) / WALLET_SECRET_KEY.length.toFixed(6);
+    (Math.pow(10, Decimal) * amount) / WALLET_SECRET_KEY.length.toFixed(3);
 
   if (option == "buy") {
     input = WrapSOL;
@@ -242,7 +242,7 @@ app.get("/sellsall", async (req, res) => {
   for (let index = 0; index < token_amount_list.length; index++) {
     let InAmount = Math.pow(10, Decimal) * Number(token_amount_list[index]);
     if (InAmount > 0) {
-      await swap(input, output, InAmount, index, option);
+      await swap(input, output, InAmount.toFixed(), index, option);
     } else {
       console.log("Already Sold");
     }

@@ -24,8 +24,7 @@ const getTokenAccounts = async (wallet, connection, tokenaddress) => {
     //Parse the account data
     const parsedAccountInfo = account.account.data;
     const mintAddress = parsedAccountInfo["parsed"]["info"]["mint"];
-    console.log("mintAddress---------", mintAddress);
-    console.log("tokenaddress---------", tokenaddress);
+
     if (mintAddress == tokenaddress) {
       targetTokenAmount =
         parsedAccountInfo["parsed"]["info"]["tokenAmount"]["uiAmount"];

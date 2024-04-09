@@ -34,9 +34,6 @@ const swap = async (input, output, inputAmount, index, option) => {
   } catch (error) {
     console.error("quote-error", error);
   }
-  console.log(
-    `https://quote-api.jup.ag/v6/quote?inputMint=${input}&outputMint=${output}&amount=${inputAmount}&slippageBps=${SLIPPAGE}`
-  );
   const quoteResponseData = quoteResponse.data;
   let swapTransaction = null;
   await axios
@@ -59,7 +56,6 @@ const swap = async (input, output, inputAmount, index, option) => {
       swapTransaction.swapTransaction,
       "base64"
     );
-    console.log("swapTransactionBuf---------", swapTransactionBuf);
     var transaction = VersionedTransaction.deserialize(swapTransactionBuf); //    sign the transaction
     transaction.sign([wallet]);
     const rawTransaction = transaction.serialize();
