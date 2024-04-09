@@ -44,7 +44,7 @@ const TablePagination = (props) => {
               <th>SOL Amount</th>
               <th>Token Amount</th>
               <th>PNL</th>
-              <th>Close</th>
+              {/* <th>Close</th> */}
             </tr>
           </thead>
           <tbody>
@@ -60,10 +60,10 @@ const TablePagination = (props) => {
                     {row.wallet_address}
                   </a>
                 </td>
-                <td>{`${row.sol_amount.toFixed(4)} SOL`}</td>
-                <td>{row.token_amount.toFixed(4)}</td>
-                <td>{row.pnl.toFixed(6)}</td>
-                <td>
+                <td>{`${row.sol_amount} SOL`}</td>
+                <td>{row.token_amount}</td>
+                <td>{row.pnl}</td>
+                {/* <td>
                   {
                     <Button
                       style={{
@@ -85,7 +85,7 @@ const TablePagination = (props) => {
                       Close Wallet
                     </Button>
                   }
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>
